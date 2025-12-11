@@ -21,6 +21,7 @@ export interface Player {
   hand: Card[];
   scorePile: Card[];
   score: number;
+  timeUsed: number; // Time spent in seconds
 }
 
 export interface BoardSlot {
@@ -43,4 +44,28 @@ export interface GameState {
   winner: Player | null;
   logs: GameLog[];
   turnCount: number;
+  startTime: number;
+}
+
+export interface User {
+  username: string;
+  email: string;
+  passwordHash: string; // In a real app, this would be hashed securely
+  createdAt: number;
+}
+
+export interface PlayerResult {
+  name: string;
+  score: number;
+  rank: number;
+  timeUsed: number;
+  isUser: boolean;
+}
+
+export interface GameHistoryRecord {
+  id: string;
+  date: number;
+  duration: number; // Total game duration in seconds
+  winnerName: string;
+  players: PlayerResult[];
 }

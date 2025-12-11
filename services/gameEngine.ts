@@ -28,16 +28,17 @@ export const generateDeck = (): Card[] => {
 export const initializeGame = (humanName: string): GameState => {
   const deck = generateDeck();
   const players: Player[] = [];
-  const playerNames = ["Bot Alpha", "Bot Beta", "Bot Gamma"];
+  const playerNames = ["电脑 1", "电脑 2", "电脑 3"];
 
   // Create Human Player
   players.push({
     id: 'p1',
-    name: humanName || 'Player 1',
+    name: humanName || '玩家 1',
     isHuman: true,
     hand: [],
     scorePile: [],
-    score: 0
+    score: 0,
+    timeUsed: 0
   });
 
   // Create Bots (Total 4 players for best balance)
@@ -48,7 +49,8 @@ export const initializeGame = (humanName: string): GameState => {
       isHuman: false,
       hand: [],
       scorePile: [],
-      score: 0
+      score: 0,
+      timeUsed: 0
     });
   }
 
@@ -79,8 +81,9 @@ export const initializeGame = (humanName: string): GameState => {
     deck,
     gameStatus: 'playing',
     winner: null,
-    logs: [{ id: 'init', message: 'Game Started! Good luck.', type: 'info' }],
-    turnCount: 1
+    logs: [{ id: 'init', message: '游戏开始！请努力赢得更多卡牌。', type: 'info' }],
+    turnCount: 1,
+    startTime: Date.now()
   };
 };
 
@@ -99,7 +102,7 @@ export const playTurn = (state: GameState, playerId: string, cardsToPlay: Card[]
   // 1. Log Action
   newState.logs.unshift({
     id: Date.now().toString(),
-    message: `${player.name} played ${cardsToPlay.length} ${ANIMAL_DATA[animalType].name}(s).`,
+    message: `${player.name} 打出了 ${cardsToPlay.length} 张${ANIMAL_DATA[animalType].name}。`,
     type: 'action'
   });
 
@@ -144,7 +147,7 @@ export const playTurn = (state: GameState, playerId: string, cardsToPlay: Card[]
       player.score = player.scorePile.length;
       newState.logs.unshift({
         id: Date.now().toString() + 'cap',
-        message: `${ANIMAL_DATA[animalType].name}s scared away ${capturedCards.length} ${capturedAnimalName}(s)!`,
+        message: `${ANIMAL_DATA[animalType].name} 吓跑了 ${capturedCards.length} 张${capturedAnimalName}！`,
         type: 'capture'
       });
     }
@@ -175,12 +178,29 @@ export const playTurn = (state: GameState, playerId: string, cardsToPlay: Card[]
     newState.winner = winners[0]; // Simple tie-break: first player found (could add shared victory logic)
     newState.logs.unshift({
       id: 'end',
-      message: `Game Over! Winner: ${winners.map(w => w.name).join(', ')} with ${maxScore} cards.`,
+      message: `游戏结束！获胜者：${winners.map(w => w.name).join(', ')}，得分：${maxScore} 张卡牌。`,
       type: 'info'
     });
   } else {
     // 7. Advance Turn
-    newState.currentPlayerIndex = (newState.currentPlayerIndex + 1) % newState.players.length;
+    // Logic: Skip players who have no cards (only possible when deck is empty)
+    let nextIndex = (newState.currentPlayerIndex + 1) % newState.players.length;
+    let loopCount = 0;
+
+    // While the next player has no cards, keep skipping.
+    // Safety check: loopCount ensures we don't freeze if logic is wrong, 
+    // though isGameEnd check above should prevent infinite loop.
+    while (newState.players[nextIndex].hand.length === 0 && loopCount < newState.players.length) {
+      newState.logs.unshift({
+        id: Date.now().toString() + 'skip',
+        message: `${newState.players[nextIndex].name} 没有手牌，跳过回合。`,
+        type: 'info'
+      });
+      nextIndex = (nextIndex + 1) % newState.players.length;
+      loopCount++;
+    }
+
+    newState.currentPlayerIndex = nextIndex;
     newState.turnCount++;
   }
 

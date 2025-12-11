@@ -30,11 +30,11 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({ player, selectedCardIds,
                 : 'bg-slate-700 text-slate-500 cursor-not-allowed'}
             `}
           >
-            PLAY CARDS ({selectedCount})
+            出牌 ({selectedCount})
           </button>
         ) : (
           <div className="text-slate-400 font-medium animate-pulse">
-            Waiting for opponents...
+            {player.hand.length === 0 ? "你已出完手牌" : "等待其他玩家..."}
           </div>
         )}
       </div>
@@ -51,7 +51,7 @@ export const PlayerHand: React.FC<PlayerHandProps> = ({ player, selectedCardIds,
           </div>
         ))}
         {player.hand.length === 0 && (
-          <div className="text-slate-500 italic mt-8">Your hand is empty</div>
+          <div className="text-slate-500 italic mt-8">你没有手牌了</div>
         )}
       </div>
     </div>

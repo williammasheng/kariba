@@ -22,7 +22,7 @@ export const Waterhole: React.FC<WaterholeProps> = ({ board }) => {
       {/* Center Water */}
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 md:w-32 md:h-32 bg-blue-500/30 rounded-full blur-xl animate-pulse"></div>
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-slate-500 font-bold opacity-20 text-4xl">
-        WATER
+        水源
       </div>
 
       {board.map((slot, index) => {
@@ -66,7 +66,7 @@ export const Waterhole: React.FC<WaterholeProps> = ({ board }) => {
               {/* Stack of Cards */}
               <div className="relative w-full h-full flex items-center justify-center">
                 {count === 0 && (
-                  <div className="text-slate-600 text-xs">Empty</div>
+                  <div className="text-slate-600 text-xs">空</div>
                 )}
                 {slot.cards.map((card, idx) => (
                   <div 
